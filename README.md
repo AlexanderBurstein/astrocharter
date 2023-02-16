@@ -67,9 +67,9 @@ After preparing env.local.test DATABASE_URL line and running command lines from 
 
  ## Author
 
-👤 **Alexander Brovchenko**
+👤 **Alexander Burstein**
 
-* Github: [@AlexanderBrovchenko](https://github.com/AlexanderBrovchenko)
+* Github: [@AlexanderBurstein](https://github.com/AlexanderBurstein)
 * LinkedIn: [@alexander-brovchenko-b48a8a6](https://linkedin.com/in/alexander-brovchenko-b48a8a6)
 
 ## Show your support
