@@ -1,0 +1,13 @@
+body {
+    text-align:center;
+    height: 445px;
+    width: 420px;
+    overflow: hidden;
+    background-color: blanchedalmond;
+    border: 0;
+}
+
+.img_wheel {
+   height: 445px;
+   width: 420px;
+}

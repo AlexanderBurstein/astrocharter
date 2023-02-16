@@ -1,0 +1,226 @@
+{% extends 'base.html.twig' %}
+    {% block title %}Charts analyzer{% endblock %}
+    {% block stylesheets %}
+        <script src="https://api-maps.yandex.ru/2.1/?lang=en&amp;apikey=7a2ac894-73db-4908-890a-84f2bcb6b10f" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.css">
+        <style>
+            body {
+                background: url('{{ root_prefix }}images/198f4ec6774226bdd11d6bd649a5c226.jpg') no-repeat center center fixed;
+                background-size: cover;
+            }
+            .form-input, .typeahead__container {
+                width: 300px !important;
+                margin-bottom: 10px;
+                font-size: 12px;
+            }
+            .form-group {
+                padding-top: 10px;
+            }
+            .required {
+                min-width: 80px;
+            }
+            .invisible-row {
+                display:none;
+            }
+            .fake_button, .fake_button_right {
+                background: transparent;
+                border: 0;
+                color: rgb(51, 122, 183);
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .fake_button:hover, .fake_button_right:hover {
+                text-decoration: underline;
+            }
+            .fake_button_right {
+                float: right;
+             }
+            .button-submit {
+                display: inline-block;
+                width: 300px;
+                height: 35px;
+                line-height: 35px;
+                border-radius: 5px;
+                text-align: center;
+                background: seashell;
+                box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+                transition: .3s;
+            }
+            .button-submit:hover {
+                background: transparent;
+                margin: 8px 0px;
+                box-shadow: 0 15px 20px rgba(46, 46, 157, .4);
+                transform: translateY(-7px);
+            }
+            .natal-wheel {
+                display:inline-block;
+                max-width: 100%;
+            }
+	    #div_popup {
+		position: relative;
+		min-width: 300px;
+		min-height: 120px;
+		color: blue;
+		z-index:10;
+            }
+        </style>
+    {% endblock %}
+{% block body %}
+{% if app.user != null %}
+    <div class="two">
+    <h1>Let's see this person</h1>
+    {% form_theme form with ['foundation_6_layout.html.twig'] only %}
+    {{ form_start(form) }}
+    <table>
+        <tr>
+            <td>
+                {{ form_label(form.fullname) }}
+            </td>
+            <td>
+                {{ form_widget(form.fullname) }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.birthdate) }}
+            </td>
+            <td>
+                <div class="form-group form-input">
+                    <div class="input-group date" id="datetimepicker1">
+                        {{ form_widget(form.birthdate) }}
+                        <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.timezone) }}
+            </td>
+            <td>
+                {{ form_widget(form.timezone) }}
+            </td>
+        </tr>
+        <tr class="invisible-row">
+            <td>
+                {{ form_label(form.place) }}
+            </td>
+            <td id="place_container">
+                {{ form_widget(form.place) }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.place) }}
+            </td>
+            <td>
+                <div class="typeahead__container">
+                    <div class="typeahead__field">
+                        <div class="typeahead__query">
+                            <input class="js-typeahead form-input"
+                                   name="q"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                {{ form_end(form) }}
+            </td>
+        </tr>
+    </table>
+    <div id="extra_data" class="three">
+        {%  if people %}<h2>Hi, {{ username }}! Your persons:</h2>{% endif %}
+        <ul class="nav navbar-nav navbar-left">
+            {% for key, value in people %}
+                <li><a class="kd-nav-link" href="{{ path('person_show', {'id': key}) }}">{{ value }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+    {% endif %}
+<div class="one">
+    <center><img src = '{{ natal_wheel_path }}' class="natal-wheel"/></center>
+    </div>
+    <div id="div_popup" style="display:none;"><span id="text_popup" style="white-space:pre;"/></div>
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.min.js"></script>
+
+    <script>
+        $(function () {
+        {% if app.user != null %}
+            $('#datetimepicker1').datetimepicker({'format': 'YYYY-MM-DDTHH:mm', 'locale': 'en', 'sideBySide' : false});
+
+        $('#datetimepicker1 > input').click(function(){
+            $('#datetimepicker1.input-group-addon').trigger('click');
+        });
+
+        $('#datetimepicker1').data("DateTimePicker").date('{{ person.birthdate | date('Y-m-d H:i') }}');
+
+        $('#person_timezone').prop('selectedIndex', 0);
+
+        var cities = [];
+        $('#transit_place').children().each(function(){
+            if (this.selected)
+                $('.js-typeahead').val(this.innerText);
+            cities.push(this.innerText);
+        });
+
+        $('.js-typeahead').typeahead({
+            order: "asc",
+            source: {
+                data: cities
+            },
+            callback: {
+                onClickAfter: function (node, a, item, event) {
+                    $('#person_place option').filter(function() {
+                        return $(this).text() == item.display;
+                    }).prop('selected', true);
+                }
+            }
+        });
+        {%  endif %}
+        $(window).on("load resize", function () {
+            resizeBlockOne();
+        });
+
+        function resizeBlockOne() {
+            $('.natal-wheel').css('max-height', $(window).height());
+            if ($('.two table').length == 0)
+                    return false;
+            if ($('.two table')[0].offsetWidth > $('.natal-wheel')[0].offsetLeft)
+                $('.one').css('top', $('.two')[0].offsetHeight + 'px');
+            else
+                $('.one').css('top', '0px');
+        }
+	$('.natal-wheel').on("click", function(e){
+            e = e || window.event;
+            e.preventDefault();
+            var imageCenterX = Math.floor(e.target.width / 2);
+	    var imageCenterY = e.target.height - imageCenterX;
+	    var angleFromAsc = Math.atan2(e.offsetY - imageCenterY, imageCenterX - e.offsetX) * 180 / Math.PI;
+	    var curDate = new Date($('#datetimepicker1 #transit_birthdate')[0].value);
+	    var timeToSeek = new Date(curDate.getTime() + angleFromAsc * 240000).toLocaleTimeString			('ru-RU', {hour: '2-digit', minute:'2-digit'});
+	    var direction = angleFromAsc > 0 ? "East" : "West";
+	    $('#text_popup').text("Time to be here is: " + timeToSeek + "\nOr move " + Math.round(Math.abs(angleFromAsc)) + " degrees to the " + direction);
+	    $('#div_popup').css({top:e.clientY + window.pageYOffset,left:e.clientX + window.pageXOffset});
+	    $('#div_popup').toggle(1000);
+         });
+    });
+    </script>
+{% endblock %}

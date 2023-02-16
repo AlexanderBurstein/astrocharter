@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+        <link rel="shortcut icon" href="/feb-space-go-02-128.png" type="image/png">
+        <style>
+            html, body {
+                width: 100%; height: 100%; padding: 0; margin: 0;
+            }
+            h1 {
+                horiz-align: center;
+            }
+            .col {
+                display:inline-block;
+            }
+            .one {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                float: left;
+                z-index: 1;
+            }
+            .two {
+                width: 30%;
+                float: right;
+                position: absolute;
+                background: transparent;
+                display:block;
+                z-index: 2;
+                margin-left: 10px;
+            }
+            .three {
+                position: absolute;
+                top: 360px;
+                float: left;
+                background: transparent;
+                z-index: 2;
+                margin-left: 10px;
+            }
+            nav {
+                background: transparent;
+                float:right;
+                height: 30px;
+                width: 100px;
+                z-index: 3;
+            }
+            .kd-nav-link:hover {
+                background: transparent !important;
+            }
+        </style>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+    <nav class="navbar" >
+        <ul class="nav navbar-nav navbar-right">
+            {% if app.user %}
+                <li><a class="kd-nav-link" href="{{ path('app_logout') }}">Logout</a></li>
+            {% else %}
+                <li><a class="kd-nav-link" href="{{ path('app_login') }}">Login</a></li>
+                <li>
+                    <a class="kd-nav-link" href="{{ path('registration') }}">Register</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% block body %}{% endblock %} {% block javascripts %}{% endblock %}
+    </body>
+    </html>
+</html>

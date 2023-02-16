@@ -1,0 +1,311 @@
+{% extends 'base.html.twig' %}
+    {% block title %}Charts analyzer{% endblock %}
+    {% block stylesheets %}
+        <script src="https://api-maps.yandex.ru/2.1/?lang=en&amp;apikey=7a2ac894-73db-4908-890a-84f2bcb6b10f" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.css">
+        <style>
+            body {
+                background: url('{{ root_prefix }}images/198f4ec6774226bdd11d6bd649a5c226.jpg') no-repeat center center fixed;
+                background-size: cover;
+            }
+            .form-input, .typeahead__container {
+                width: 300px !important;
+                margin-bottom: 10px;
+                font-size: 12px;
+            }
+            .form-group {
+                padding-top: 10px;
+            }
+            .required {
+                min-width: 80px;
+            }
+            .invisible-row {
+                display:none;
+            }
+            .fake_button, .fake_button_right {
+                background: transparent;
+                border: 0;
+                color: rgb(51, 122, 183);
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .fake_button:hover, .fake_button_right:hover {
+                text-decoration: underline;
+            }
+            .fake_button_right {
+                float: right;
+             }
+            .button-submit {
+                display: inline-block;
+                width: 300px;
+                height: 35px;
+                line-height: 35px;
+                border-radius: 5px;
+                text-align: center;
+                background: seashell;
+                box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+                transition: .3s;
+            }
+            .button-submit:hover {
+                background: transparent;
+                margin: 8px 0px;
+                box-shadow: 0 15px 20px rgba(46, 46, 157, .4);
+                transform: translateY(-7px);
+            }
+            .natal-wheel {
+                display:inline-block;
+                max-width: 100%;
+            }
+            #aspect_grid_img {
+                cursor: pointer;
+                width: 60%;
+            }
+            .popup-fade {
+                display: none;
+            }
+            .popup-fade:before {
+                content: '';
+                background: #000;
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0.7;
+                z-index: 9999;
+            }
+            .popup {
+                position:fixed;
+                top: 10%;
+                left: 5%;
+                padding: 20px;
+                width: 90%;
+                background-image: radial-gradient(azure, lightcyan);
+                background-size: 100%;
+                border: 1px solid orange;
+                border-radius: 4px;
+                z-index: 99999;
+                opacity: 1;
+                max-height: 75%;
+                overflow-y: scroll;
+            }
+            .popup-close {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+        </style>
+    {% endblock %}
+{% block body %}
+{% if app.user != null %}
+    <div class="two">
+    <h1>Let's see this person</h1>
+    {% form_theme form with ['foundation_6_layout.html.twig'] only %}
+    {{ form_start(form) }}
+    <table>
+        <tr>
+            <td>
+                {{ form_label(form.fullname) }}
+            </td>
+            <td>
+                {{ form_widget(form.fullname) }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.birthdate) }}
+            </td>
+            <td>
+                <div class="form-group form-input">
+                    <div class="input-group date" id="datetimepicker1">
+                        {{ form_widget(form.birthdate) }}
+                        <span class="input-group-addon">
+                          <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.timezone) }}
+            </td>
+            <td>
+                {{ form_widget(form.timezone) }}
+            </td>
+        </tr>
+        <tr class="invisible-row">
+            <td>
+                {{ form_label(form.place) }}
+            </td>
+            <td id="place_container">
+                {{ form_widget(form.place) }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ form_label(form.place) }}
+            </td>
+            <td>
+                <div class="typeahead__container">
+                    <div class="typeahead__field">
+                        <div class="typeahead__query">
+                            <input class="js-typeahead form-input"
+                                   name="q"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                {{ form_widget(form.newplace) }}
+                {% if root_prefix != '' %}{{ form_widget(form.newperson) }}{% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                {{ form_end(form) }}
+            </td>
+        </tr>
+    </table>
+    <div id="extra_data" class="three">
+        {%  if people %}<h2>Hi, {{ username }}! Your persons:</h2>{% endif %}
+        <ul class="nav navbar-nav navbar-left">
+            {% for key, value in people %}
+                <li><a class="kd-nav-link" href="{{ path('person_show', {'id': key}) }}">{{ value }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+    {% endif %}
+<div class="one">
+    <center><img src = '{{ natal_wheel_path }}' class="natal-wheel"/>
+        <br><br><p>Click inside the tables image can give you info by planet or by sign (or you can read full natal info below)</p>
+        <a href="#" class="popup-open"
+                {% for key, value in planet_explanation_htmls %}
+                    data-hint-planet-{{ key }}="#real-hint-planet-{{ key }}"
+                {% endfor %}
+                {% for key, value in sign_explanation_htmls %}
+            data-hint-sign-{{ key }}="#real-hint-sign-{{ key }}"
+                {% endfor %}>
+        <img src = '{{ natal_aspect_grid_path }}' id="aspect_grid_img"/></a>
+    <br><div id="test"></div><br></center>
+    {{ natal_explanation | raw }}
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.min.js"></script>
+
+    <script>
+        $(function () {
+        {% if app.user != null %}
+            $('#datetimepicker1').datetimepicker({'format': 'YYYY-MM-DDTHH:mm', 'locale': 'en', 'sideBySide' : false});
+
+        $('#datetimepicker1 > input').click(function(){
+            $('#datetimepicker1.input-group-addon').trigger('click');
+        });
+
+        $('#datetimepicker1').data("DateTimePicker").date('{{ person.birthdate | date('Y-m-d H:i') }}');
+
+        $('#person_timezone').prop('selectedIndex', 0);
+
+        var cities = [];
+        $('#person_place').children().each(function(){
+            if (this.selected)
+                $('.js-typeahead').val(this.innerText);
+            cities.push(this.innerText);
+        });
+
+        $('.js-typeahead').typeahead({
+            order: "asc",
+            source: {
+                data: cities
+            },
+            callback: {
+                onClickAfter: function (node, a, item, event) {
+                    $('#person_place option').filter(function() {
+                        return $(this).text() == item.display;
+                    }).prop('selected', true);
+                }
+            }
+        });
+        {%  endif %}
+        $(window).on("load resize", function () {
+            resizeBlockOne();
+        });
+
+        $('.popup-open').on("click", function(e){
+            e = e || window.event;
+            e.preventDefault();
+            var html_num_to_open = parseInt(e.offsetY * e.target.naturalHeight / e.target.height / 25);
+            var hint = '';
+            if (15 > html_num_to_open) {
+                if (e.offsetX  * e.target.naturalHeight / e.target.height < {{ offset_x_sign_explanation_border }})
+                    hint += '-planet-' + html_num_to_open;
+                else
+                    hint += '-sign-' + html_num_to_open;
+                $('#fade' + hint).show(100);
+            }
+            return false;
+        });
+
+        $('.popup-close').click(function() {
+            $(this).parents('.popup-fade').toggle('explode');
+            return false;
+        });
+
+        $(document).keydown(function(e) {
+            if (e.keyCode === 27) {
+                e.stopPropagation();
+                $('.popup-fade').toggle('explode');
+            }
+        });
+
+        $('.popup-fade').click(function(e) {
+            if ($(e.target).closest('.popup').length == 0) {
+                $(this).toggle('explode');
+            }
+        });
+
+        function resizeBlockOne() {
+            $('.natal-wheel').css('max-height', $(window).height());
+            if ($('.two table').length == 0)
+                    return false;
+            if ($('.two table')[0].offsetWidth > $('.natal-wheel')[0].offsetLeft)
+                $('.one').css('top', $('.two')[0].offsetHeight + 'px');
+            else
+                $('.one').css('top', '0px');
+        }
+    });
+    </script>
+    {% for key, value in planet_explanation_htmls %}
+        <div class="popup-fade" id="fade-planet-{{ key }}">
+            <div class="popup">
+                <a class="popup-close" href="#">Close</a>
+                <p>{{ value | raw }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    {% for key, value in sign_explanation_htmls %}
+        <div class="popup-fade" id="fade-sign-{{ key }}">
+            <div class="popup">
+                <a class="popup-close" href="#">Close</a>
+                <p>{{ value | raw }}</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
