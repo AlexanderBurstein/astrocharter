@@ -23,7 +23,7 @@
 1. Clone the project from GitHub:
 
         $ cd YOUR_WEBSITE_FOLDER
-        $ git clone https://github.com/AlexanderBrovchenko/kd_astro_glance.git
+        $ git clone https://github.com/AlexanderBurstein/astrocharter.git
 
  2a. (if needed) Install Composer (see http://getcomposer.org/download)
 
@@ -70,7 +70,7 @@ After preparing env.local.test DATABASE_URL line and running command lines from 
 👤 **Alexander Burstein**
 
 * Github: [@AlexanderBurstein](https://github.com/AlexanderBurstein)
-* LinkedIn: [@alexander-brovchenko-b48a8a6](https://linkedin.com/in/alexander-brovchenko-b48a8a6)
+* LinkedIn: [@alexander-burstein-640b69266](https://www.linkedin.com/in/alexander-burstein-640b69266/)
 
 ## Show your support
 
